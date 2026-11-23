@@ -1,0 +1,26 @@
+Loading ProtT5 model...
+Processing UP000000425_122586...
+
+############# EMBEDDING STATS #############
+Total number of per-residue embeddings: 0
+Total number of per-protein embeddings: 2003
+Time for generating embeddings: 1.2[m] (0.036[s/protein])
+
+############# END #############
+Processing UP000000429_85962...
+
+############# EMBEDDING STATS #############
+Total number of per-residue embeddings: 0
+Total number of per-protein embeddings: 1554
+Time for generating embeddings: 0.9[m] (0.035[s/protein])
+
+############# END #############
+Processing UP000000431_272561...
+
+############# EMBEDDING STATS #############
+Total number of per-residue embeddings: 0
+Total number of per-protein embeddings: 895
+Time for generating embeddings: 0.6[m] (0.039[s/protein])
+
+############# END #############
+Processing UP000000437_7955...

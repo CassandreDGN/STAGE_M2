@@ -12,6 +12,8 @@ import time
 from tqdm import tqdm
 import h5py
 import argparse
+import os
+import glob
 
 
 
@@ -89,12 +91,8 @@ def get_embeddings( model, tokenizer, seqs, per_residue, per_protein,
                 if per_residue: # store per-residue embeddings (Lx1024)
                     results["residue_embs"][ identifier ] = emb.detach().cpu().numpy().squeeze()
                 if per_protein: # apply max-pooling to derive per-protein embeddings (1024-d)
-                    if use_idctq:
-                        protein_emb = idct_quant_prost(emb.detach().cpu().numpy().squeeze())
-                        results["protein_embs"][identifier]  = protein_emb
-                    else:
-                        protein_emb = emb.mean(dim=0)
-                        results["protein_embs"][identifier] = protein_emb.detach().cpu().numpy().squeeze()
+                    protein_emb = emb.mean(dim=0)
+                    results["protein_embs"][identifier] = protein_emb.detach().cpu().numpy().squeeze()
 
 
     passed_time=time.time()-start
@@ -129,25 +127,31 @@ if __name__ == "__main__":  #replace sys w:: arcparse
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("fastainput", help="Chemin du fichier fasta")
-    parser.add_argument("h5output", help="Chemin de l'output H5")
+    parser.add_argument("input_directory", help="Chemin du dossier contenant les fichiers fasta")
+    parser.add_argument("output_directory", help="Chemin du dossier de sortie pour les fichiers h5")
 
     args = parser.parse_args()        
+    os.makedirs(args.output_directory, exist_ok=True)
 
-    fasta_input = args.fastainput
-    h5_output = args.h5output 
-
+    print("Loading ProtT5 model...")
     model, tokenizer = get_T5_model()
-    PROTEOME = fasta_input
-    SAVE_F = h5_output
 
+    fasta_files = sorted(glob.glob(os.path.join(args.input_directory, "*.fasta")))
 
-    proteins  = extract_seq_FASTA(PROTEOME)
-    res = get_embeddings(model, tokenizer, proteins , False, True,
-                   max_residues=4000, max_seq_len=1000, max_batch=100 )
-    save_embeddings(res['protein_embs'], SAVE_F)
+    for fasta_input in fasta_files:
+        basename = os.path.splitext(os.path.basename(fasta_input))[0]
+        h5_output = os.path.join(args.output_directory, f"{basename}.h5")
+
+        if os.path.exists(h5_output):
+            print(f"Output file {h5_output} already exists. Skipping...")
+            continue
+
+        print(f"Processing {basename}...")
+        proteins = extract_seq_FASTA(fasta_input)
+        res = get_embeddings(model, tokenizer, proteins, False, True,max_residues=4000, max_seq_len=1000, max_batch=100)
+        save_embeddings(res['protein_embs'], h5_output)
 
 #/home/cassandre/.conda/envs/old_protT5_env/bin/python /home/cassandre/stage/Cassandre/Code/protT5_embedding.py input.fasta output.h5
 
-# sbatch -p gpu --gres=gpu:1 --wrap="/home/cassandre/.conda/envs/old_protT5_env/bin/python /home/cassandre/stage/Cassandre/Code/protT5_embedding.py input.fasta output.h5"
 # sbatch -p gpu --gres=gpu:1 path
+# sbatch -p gpu --gres=gpu:1 /home/cassandre/M2STAGE/scripts/protT5_embedding.py /data/cassandre/01_qfo_raw /data/cassandre/03_embeddings

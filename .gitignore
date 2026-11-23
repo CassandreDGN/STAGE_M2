@@ -224,3 +224,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+/home/cassandre/M2STAGE/log_output/slurm_out
