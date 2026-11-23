@@ -74,16 +74,15 @@ def get_embeddings( model, tokenizer, seqs, per_residue, per_protein,
             try:
                 with torch.no_grad():
                     embedding_repr = model(input_ids, attention_mask=attention_mask)
+                    
             except RuntimeError as e:
-                if "out of memory" in str(e).lower() and device == "cuda":
-                    print(f"GPU OOM for {identifiers} (max L={max(seq_lens)}), falling back to CPU...")
+                if "out of memory" in str(e).lower():
+                    print(f"GPU OOM for {identifiers} (max L={max(seq_lens)}), skipping...")
                     torch.cuda.empty_cache()
-                    model_cpu = model.to("cpu")
-                    with torch.no_grad():
-                        embedding_repr = model_cpu(input_ids.to("cpu"), attention_mask=attention_mask.to("cpu"))
-                    model.to(device)  # move model back to GPU for remaining batches
+                    continue
                 else:
                     raise e
+                
             for batch_idx, identifier in enumerate(identifiers): # for each protein in the current mini-batch
                 s_len = seq_lens[batch_idx]
                 # slice off padding --> batch-size x seq_len x embedding_dim
