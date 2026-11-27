@@ -4,7 +4,6 @@ log_output/slurm_out
 log_output/slurm_out/
 log_output
 results/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -229,4 +228,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-/home/cassandre/M2STAGE/log_output/slurm_out
+/home/cassandre/M2STAGE/log_output/slurm_outconda/
+conda/speciestree/

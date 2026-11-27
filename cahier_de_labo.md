@@ -21,7 +21,11 @@ wget -b -r -np -nd -A "*.fasta.gz" -R "*_DNA.fasta.gz,*_additional.fasta.gz" ftp
 # 26-11-26
 
 - Checked a few embeddings using `/home/cassandre/stage/Cassandre/M1_INTERNSHIP/Code/PHASE1_OUTLIERS/umap_outliers.py` to see if it made sense (it did)
-- 
 
+# 27-11-26
+
+- Created the script to make the speciestree needed for orthofinder `(/home/cassandre/M2STAGE/scripts/speciestree.py)`
+    - Generated the species tree with the 81 species.
+- Made a little script to sbatch orthofinder (had some trouble, debugged mainly with AI) `/home/cassandre/M2STAGE/scripts/orthofinder.sh`
 
 
